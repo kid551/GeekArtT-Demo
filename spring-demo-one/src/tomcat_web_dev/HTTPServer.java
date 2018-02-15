@@ -34,7 +34,9 @@ public class HTTPServer {
 				final Socket socket = serverSocket.accept();
 				System.out.println("A new TCP connection with client has been built, the client address is: " 
 											+ socket.getInetAddress() + ":" + socket.getPort());
-				service(socket);
+				try {
+					service(socket);
+				} catch (NullPointerException e) { System.out.println("The resource you request is NOT found!"); }
 			}
 		} catch(Exception e) { e.printStackTrace(); }
 		
