@@ -6,7 +6,8 @@ import java.net.*;
 
 public class HTTPClient {
 	public static void main(String[] args) {
-		// Determine the uri of HTTP request
+		// Determine the uri of HTTP request, e.g,
+		//     "index.htm, index.jsp, hello1.html"
 		String uri = "index.htm";
 		if(0 != args.length) {
 			uri = args[0];

@@ -3,8 +3,16 @@ package tomcat_web_dev;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Map;
 
 public class HTTPProtocolUtils {
+	final static String SERVLET_PACKAGE = "tomcat_web_dev.";
+	
+	public static byte[] getRequestBuffer(Socket socket) throws Exception {
+		int size = socket.getInputStream().available();
+		return new byte[size];
+	}
+	
 	public static String getHttpRequestInfo(Socket socket) throws Exception {	
 		/**
 		 * Why do we have to use bytes and stream? 
@@ -121,5 +129,32 @@ public class HTTPProtocolUtils {
 		System.out.println(new String(buffer));	
 	}
 	
+	public static String getServletName(String uri) {
+		// Get servlet's name
+		String servletName = null;
+		if(uri.indexOf("?") != -1) {
+			servletName = uri.substring(uri.indexOf("servlet/") + 8, uri.indexOf("?"));
+		} else {
+			// If the Servlet request is NOT under servlet directory,
+			// then treat it as normal static file.
+			servletName = uri.substring(uri.indexOf("servlet/") + 8, uri.length());
+		}
+		
+		return servletName;
+	}
 	
+	public static Servlet getServlet(String servletName, Map servletCache) throws Exception {
+		// Try to get servlet from cache
+		Servlet servlet = (Servlet) servletCache.get(servletName);
+		
+		// If there's no existing servlet, then generate one
+		// and put it into servletCache
+		if(null == servlet) {
+			servlet = (Servlet) Class.forName( HTTPProtocolUtils.SERVLET_PACKAGE + servletName ).newInstance();
+			servlet.init();
+			servletCache.put(servletName, servlet);
+		}
+		
+		return servlet;
+	}
 }
